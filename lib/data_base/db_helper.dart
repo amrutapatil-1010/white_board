@@ -1,97 +1,84 @@
-import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
-import 'package:white_board/controller/sign_in_controller.dart';
+
 
 class DatabaseHelper {
-  static final DatabaseHelper _instance = DatabaseHelper._instance;
-  factory DatabaseHelper() => _instance;
-  DatabaseHelper._internal();
-
   late Database _database;
 
-  ///table name
-  final String signInDataTable = "signInDataTable";
-
-  ///username
-  final String userNameColumn = "userNameColumn";
-
-  ///password
-  final String passwordColumn = "passwordColumn";
-
-  ///user id
-  final String userIdColumn = "userIdColumn";
-
-  ///crate Table
-  Future openDB() async {
-    final dbPath = await getDatabasesPath();
-    if (_database.isOpen) return;
-
+  Future<void> openDB() async {
     final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, 'signin_data.db');
-    _database =
-        await openDatabase(path, version: 1, onCreate: (Database db, version) {
+    final path = join(databasesPath, 'your_database.db');
+
+    _database = await openDatabase(path, version: 1, onCreate: (db, version) {
       db.execute('''
-          CREATE TABLE $signInDataTable(
-            $userIdColumn INTEGER PRIMARY KEY AUTOINCREMENT,
-            $userNameColumn TEXT NOT NULL,
-            $passwordColumn TEXT NOT NULL
-          )
-        ''');
+        CREATE TABLE your_table (
+          id INTEGER PRIMARY KEY,
+          userName TEXT,
+          password TEXT,
+          userId INTEGER
+        )
+      ''');
     });
   }
 
-  ///Insert data
-  Future<int> insertSignInData(SignInData data) async {
+  Future<int> insertData(SignInModel data) async {
     await openDB();
-    return _database.insert(signInDataTable, data.toMap());
+    return await _database.insert('your_table', data.toMap());
   }
 
-  ///update data
-  Future<int> updateSignIndata(SignInData data) async {
+  Future<List<SignInModel>> getData() async {
     await openDB();
-    return _database.update(signInDataTable, data.toMap(),
-        where: "id=?", whereArgs: [data.userId]);
+    final List<Map<String, dynamic>> maps = await _database.query('your_table');
+    return List.generate(maps.length, (index) {
+      return SignInModel.fromMap(maps[index]);
+    });
   }
 
-  ///Sign in delete
-  Future<int> deleteSignInData(SignInData data) async {
+  Future<int> updateData(SignInModel data) async {
     await openDB();
-    return _database
-        .delete(signInDataTable, where: "id=?", whereArgs: [data.userId]);
+    return await _database.update('your_table', data.toMap(),
+        where: 'id = ?', whereArgs: [data.id]);
   }
 
-  ///SignIn getAll data
-  Future<List<SignInData>> getSignInData() async {
+  Future<int> deleteData(int id) async {
     await openDB();
-    final List<Map<String, dynamic>> maps =
-        await _database.query(signInDataTable);
-    return List.generate(
-        maps.length,
-        (index) => SignInData(
-            userName: maps[index][userNameColumn],
-            password: maps[index][passwordColumn],
-            userId: maps[index][passwordColumn]));
+    return await _database
+        .delete('your_table', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> closeDB() async {
+    await _database.close();
   }
 }
 
-class SignInData {
+class SignInModel {
+  final int? id;
   final String userName;
   final String password;
-  final String userId;
-  const SignInData(
-      {required this.userName, required this.password, required this.userId});
+  final int userId;
+
+  SignInModel({
+    this.id,
+    required this.userName,
+    required this.password,
+    required this.userId,
+  });
+
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      "userName": userName,
-      "password": password,
-      "userId": userId,
+    return {
+      'id': id,
+      'userName': userName,
+      'password': password,
+      'userId': userId,
     };
   }
 
-  @override
-  String toString() {
-    return "SignInData(userName:$userName, userId:$userId, password:$password)";
+  factory SignInModel.fromMap(Map<String, dynamic> map) {
+    return SignInModel(
+      id: map['id'],
+      userName: map['userName'],
+      password: map['password'],
+      userId: map['userId'],
+    );
   }
 }

@@ -39,11 +39,16 @@ class SignInScreen extends GetView<SignInController> {
               const SizedBox(
                 height: 30,
               ),
+              TextFieldWidget(
+                  controller: controller.tecUserId, title: "user Id"),
+              const SizedBox(
+                height: 30,
+              ),
               Align(
                 alignment: Alignment.bottomRight,
                 child: InkWell(
                   onTap: () {
-                    Get.toNamed(Routes.whiteBoard);
+                    controller.onClickSubmit();
                   },
                   child: Container(
                     alignment: Alignment.center,
