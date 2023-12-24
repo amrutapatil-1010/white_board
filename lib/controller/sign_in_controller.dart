@@ -1,9 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:white_board/controller/base_controller.dart';
 import 'package:white_board/data_base/db_helper.dart';
+
+import '../routes.dart';
 
 class SignInController extends BaseController {
   TextEditingController tecUsernameController = TextEditingController();
@@ -13,18 +13,31 @@ class SignInController extends BaseController {
   @override
   Future onInit() {
     _databaseHelper;
-    // TODO: implement onInit
+
     return super.onInit();
   }
 
   void onClickSubmit() async {
-    await _databaseHelper.insertData(SignInModel(
+    var dataInserted = await _databaseHelper.insertData(SignInModel(
         userName: tecUsernameController.text,
         password: tecPasswordController.text,
-        userId: 1));
-    log("all data --->${await _databaseHelper.getData()}");
-    // await _databaseHelper.getSignInData();
+        userId: int.parse(tecUserId.text)));
 
-    // log("the sign in data ---->${_databaseHelper.getSignInData()}");
+    if (dataInserted == null) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
+        content: const Text("data is not added"),
+        action: SnackBarAction(
+            label: "The user is already exist", onPressed: () {}),
+      ));
+      update();
+    } else {
+      Get.toNamed(Routes.listDetails);
+    }
+    update();
+  }
+
+  ///delete  database
+  void deleteDataBase(int userId) async {
+    await _databaseHelper.deleteData(userId);
   }
 }

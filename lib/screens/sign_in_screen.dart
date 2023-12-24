@@ -44,29 +44,33 @@ class SignInScreen extends GetView<SignInController> {
               const SizedBox(
                 height: 30,
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: InkWell(
-                  onTap: () {
-                    controller.onClickSubmit();
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 30,
-                    width: MediaQuery.sizeOf(context).height / 10,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colors.amber,
-                    ),
-                    child: Text(
-                      "Submit",
-                      style: Theme.of(context)
-                          .primaryTextTheme
-                          .bodySmall
-                          ?.copyWith(color: Colors.black, fontSize: 15),
+              Row(
+                children: [
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: InkWell(
+                      onTap: () {
+                        controller.onClickSubmit();
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: 30,
+                        width: MediaQuery.sizeOf(context).height / 10,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.amber,
+                        ),
+                        child: Text(
+                          "Submit",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .bodySmall
+                              ?.copyWith(color: Colors.black, fontSize: 15),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               )
             ],
           ),
